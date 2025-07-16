@@ -1,0 +1,9 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Make all MUI Buttons have white text globally */
+.MuiButton-root {
+  color: #fff !important;
+}
