@@ -1,21 +1,28 @@
 import { useZondaSales } from '../context/ZondaSalesContext';
 import { ProductService } from '../services/ProductService';
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import TableSortLabel from '@mui/material/TableSortLabel';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import Pagination from '@mui/material/Pagination';
+import Box from '@mui/material/Box';
 
 const ProductGrid = () => {
   const { selectedCustomer, products, setProducts } = useZondaSales();
+  const [sortField, setSortField] = useState<'id' | 'name' | 'price'>('id');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     if (selectedCustomer) {
@@ -23,6 +30,7 @@ const ProductGrid = () => {
     } else {
       setProducts([]);
     }
+    setPage(1); // Reset to first page when customer changes
   }, [selectedCustomer, setProducts]);
 
   const handleDelete = (id: number) => {
@@ -31,6 +39,54 @@ const ProductGrid = () => {
       setProducts(ProductService.getProductsByCustomer(selectedCustomer.id));
     }
   };
+
+  const handleSort = (field: 'id' | 'name' | 'price') => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setPage(1); // Reset to first page when sorting
+  };
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
+
+  // Sort and paginate products
+  const sortedAndPaginatedProducts = useMemo(() => {
+    const sorted = [...products].sort((a, b) => {
+      let aValue: string | number;
+      let bValue: string | number;
+
+      switch (sortField) {
+        case 'id':
+          aValue = a.id;
+          bValue = b.id;
+          break;
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'price':
+          aValue = a.price;
+          bValue = b.price;
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    const startIndex = (page - 1) * itemsPerPage;
+    return sorted.slice(startIndex, startIndex + itemsPerPage);
+  }, [products, sortField, sortDirection, page]);
+
+  const totalPages = Math.ceil(products.length / itemsPerPage);
 
   if (!selectedCustomer) {
     return (
@@ -51,28 +107,52 @@ const ProductGrid = () => {
             <TableHead>
               <TableRow sx={{ bgcolor: '#1a1a1a' }}>
                 <TableCell sx={{ 
-                  color: 'white', 
                   borderColor: '#333',
                   fontWeight: 'bold',
-                  fontSize: '0.9rem'
-                }}>
+                  fontSize: '0.9rem',
+                  color: 'white',
+                  cursor: 'pointer'
+                }}
+                onClick={() => handleSort('id')}
+                >
                   Product ID
+                  {sortField === 'id' && (
+                    <span style={{ marginLeft: '4px', color: 'white' }}>
+                      {sortDirection === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell sx={{ 
-                  color: 'white', 
                   borderColor: '#333',
                   fontWeight: 'bold',
-                  fontSize: '0.9rem'
-                }}>
+                  fontSize: '0.9rem',
+                  color: 'white',
+                  cursor: 'pointer'
+                }}
+                onClick={() => handleSort('name')}
+                >
                   Product Name
+                  {sortField === 'name' && (
+                    <span style={{ marginLeft: '4px', color: 'white' }}>
+                      {sortDirection === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell sx={{ 
-                  color: 'white', 
                   borderColor: '#333',
                   fontWeight: 'bold',
-                  fontSize: '0.9rem'
-                }}>
+                  fontSize: '0.9rem',
+                  color: 'white',
+                  cursor: 'pointer'
+                }}
+                onClick={() => handleSort('price')}
+                >
                   Price
+                  {sortField === 'price' && (
+                    <span style={{ marginLeft: '4px', color: 'white' }}>
+                      {sortDirection === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell sx={{ 
                   color: 'white', 
@@ -100,7 +180,7 @@ const ProductGrid = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                products.map((product) => (
+                sortedAndPaginatedProducts.map((product) => (
                   <TableRow 
                     key={product.id} 
                     sx={{ 
@@ -152,6 +232,36 @@ const ProductGrid = () => {
             </TableBody>
           </Table>
         </TableContainer>
+        
+        {/* Pagination */}
+        {products.length > itemsPerPage && (
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            p: 2, 
+            borderTop: '1px solid #333',
+            bgcolor: '#1a1a1a'
+          }}>
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+              sx={{
+                '& .MuiPaginationItem-root': {
+                  color: 'white',
+                  '&.Mui-selected': {
+                    bgcolor: '#1565c0',
+                    color: 'white'
+                  },
+                  '&:hover': {
+                    bgcolor: '#4b5563'
+                  }
+                }
+              }}
+            />
+          </Box>
+        )}
       </CardContent>
     </Card>
   );

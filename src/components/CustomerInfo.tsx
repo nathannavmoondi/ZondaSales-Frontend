@@ -21,7 +21,9 @@ const CustomerInfo = () => {
           alignItems: 'center',
           justifyContent: 'center',
           minHeight: '400px',
-          textAlign: 'center'
+          textAlign: 'center',
+          marginTop: '20px',
+          marginLeft: '20px'
         }}
       >
         <Avatar sx={{ width: 80, height: 80, bgcolor: '#666', mb: 2 }}>
@@ -45,7 +47,9 @@ const CustomerInfo = () => {
         mb: 4, 
         border: '1px solid #333',
         borderRadius: 2,
-        boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+           marginTop: '20px',
+          marginLeft: '20px'
       }}>
         <CardContent sx={{ p: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>

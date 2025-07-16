@@ -50,7 +50,7 @@ const ProductDetails = () => {
   return (
     <Box className="bg-black text-white">
       {/* Header Section */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, marginTop: '20px', marginLeft: '20px'}}>
         <Box>
           <Typography variant="h4" fontWeight="bold" sx={{ color: 'white', mb: 1 }}>
             Product Inventory
