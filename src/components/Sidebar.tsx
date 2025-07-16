@@ -20,26 +20,31 @@ const Sidebar = ({ selectedTab, onTabChange }: SidebarProps) => {
     setCustomers(CustomerService.getCustomers());
   }, []);
 
-  const handleCustomerChange = (customerId: number) => {
-    const customer = CustomerService.getCustomerById(customerId);
+  const handleCustomerChange = (customerId: string | number) => {
+    if (customerId === "") {
+      setSelectedCustomer(null);
+      return;
+    }
+    const customer = CustomerService.getCustomerById(Number(customerId));
     setSelectedCustomer(customer || null);
   };
 
   return (
-    <div className="bg-gray-800 text-white p-4 h-full flex flex-col">
+    <div className="bg-gray-800 text-white p-4 pt-6 pl-6 h-full flex flex-col">
       <div className="mb-6">
         <FormControl fullWidth size="small">
-          
           <Select
-            value={selectedCustomer?.id || ''}
-            onChange={(e) => handleCustomerChange(e.target.value as number)}
+            value={selectedCustomer ? selectedCustomer.id : ''}
+            onChange={(e) => handleCustomerChange(e.target.value)}
             sx={{ 
               color: 'white',
+              marginTop: '20px',
               '.MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
               '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
               '.MuiSvgIcon-root': { color: 'white' }
             }}
           >
+            <MenuItem value="" disabled>(Select Customer)</MenuItem>
             {customers.map(customer => (
               <MenuItem key={customer.id} value={customer.id}>
                 {customer.name}

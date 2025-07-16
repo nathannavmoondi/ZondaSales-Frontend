@@ -3,6 +3,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global body background color to match sidebar */
+body {
+  background-color: #181f2a; /* This matches the sidebar's bg-gray-800 color */
+  margin: 0;
+  padding: 0;
+}
+
 /* Make all MUI Buttons have white text globally */
 .MuiButton-root {
   color: #fff !important;

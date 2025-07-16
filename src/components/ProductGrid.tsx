@@ -1,85 +1,159 @@
-import { useEffect, useState } from 'react';
+import { useZondaSales } from '../context/ZondaSalesContext';
 import { ProductService } from '../services/ProductService';
-import type { Product } from '../services/ProductService';
+import { useEffect } from 'react';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import InventoryIcon from '@mui/icons-material/Inventory';
 
-const PAGE_SIZE = 5;
-const ProductGrid = ({ customerId }: { customerId?: number }) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [page, setPage] = useState(0);
-  const [sortBy, setSortBy] = useState<'id'|'name'|'price'>('id');
-  const [sortDir, setSortDir] = useState<'asc'|'desc'>('asc');
+const ProductGrid = () => {
+  const { selectedCustomer, products, setProducts } = useZondaSales();
 
   useEffect(() => {
-    if (customerId) {
-      setProducts(ProductService.getProductsByCustomer(customerId));
+    if (selectedCustomer) {
+      setProducts(ProductService.getProductsByCustomer(selectedCustomer.id));
     } else {
       setProducts([]);
     }
-    setPage(0);
-  }, [customerId]);
+  }, [selectedCustomer, setProducts]);
 
-  // Sorting
-  const sorted = [...products].sort((a, b) => {
-    let valA = a[sortBy];
-    let valB = b[sortBy];
-    if (typeof valA === 'string') valA = valA.toLowerCase();
-    if (typeof valB === 'string') valB = valB.toLowerCase();
-    if (valA < valB) return sortDir === 'asc' ? -1 : 1;
-    if (valA > valB) return sortDir === 'asc' ? 1 : -1;
-    return 0;
-  });
-  const paged = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const handleDelete = (id: number) => {
+    ProductService.deleteProduct(id);
+    if (selectedCustomer) {
+      setProducts(ProductService.getProductsByCustomer(selectedCustomer.id));
+    }
+  };
 
-  // Pagination controls
-  const totalPages = Math.ceil(products.length / PAGE_SIZE);
+  if (!selectedCustomer) {
+    return (
+      <div className="text-gray-400">Select a customer to view products.</div>
+    );
+  }
 
   return (
-    <div className="bg-black rounded-lg shadow p-4 text-white border border-gray-700">
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="text-xl font-bold text-white">Products ({products.length})</h2>
-        <button className="bg-blue-500 text-white px-4 py-2 rounded">Add Product</button>
-      </div>
-      <table className="w-full text-left">
-        <thead>
-          <tr className="bg-gray-800">
-            <th className="cursor-pointer px-2 py-1 text-white" onClick={() => {
-              setSortBy('id'); setSortDir(sortBy === 'id' && sortDir === 'asc' ? 'desc' : 'asc');
-            }}>ProductID {sortBy === 'id' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
-            <th className="cursor-pointer px-2 py-1 text-white" onClick={() => {
-              setSortBy('name'); setSortDir(sortBy === 'name' && sortDir === 'asc' ? 'desc' : 'asc');
-            }}>ProductName {sortBy === 'name' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
-            <th className="cursor-pointer px-2 py-1 text-white" onClick={() => {
-              setSortBy('price'); setSortDir(sortBy === 'price' && sortDir === 'asc' ? 'desc' : 'asc');
-            }}>ProductPrice {sortBy === 'price' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
-            <th className="px-2 py-1 text-white">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paged.map(product => (
-            <tr key={product.id} className="border-b border-gray-700">
-              <td className="px-2 py-1 text-white">{product.id}</td>
-              <td className="px-2 py-1 text-white">{product.name}</td>
-              <td className="px-2 py-1 text-white">{product.price}</td>
-              <td className="px-2 py-1">
-                <button className="text-red-400 hover:underline">Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="flex justify-between items-center mt-2">
-        <div>
-          <select value={PAGE_SIZE} className="border rounded px-2 py-1 text-white bg-gray-800 border-gray-600" disabled>
-            <option>5 items per page</option>
-          </select>
-        </div>
-        <div className="space-x-2 text-white">
-          <span>{page * PAGE_SIZE + 1} - {Math.min((page + 1) * PAGE_SIZE, products.length)} of {products.length}</span>
-          <button onClick={() => setPage(page - 1)} disabled={page === 0} className="px-2 text-white">{'<'}</button>
-          <button onClick={() => setPage(page + 1)} disabled={page >= totalPages - 1} className="px-2 text-white">{'>'}</button>
-        </div>
-      </div>
-    </div>
+    <Card sx={{ 
+      bgcolor: 'black', 
+      border: '1px solid #333',
+      borderRadius: 2,
+      boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+    }}>
+      <CardContent sx={{ p: 0 }}>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ bgcolor: '#1a1a1a' }}>
+                <TableCell sx={{ 
+                  color: 'white', 
+                  borderColor: '#333',
+                  fontWeight: 'bold',
+                  fontSize: '0.9rem'
+                }}>
+                  Product ID
+                </TableCell>
+                <TableCell sx={{ 
+                  color: 'white', 
+                  borderColor: '#333',
+                  fontWeight: 'bold',
+                  fontSize: '0.9rem'
+                }}>
+                  Product Name
+                </TableCell>
+                <TableCell sx={{ 
+                  color: 'white', 
+                  borderColor: '#333',
+                  fontWeight: 'bold',
+                  fontSize: '0.9rem'
+                }}>
+                  Price
+                </TableCell>
+                <TableCell sx={{ 
+                  color: 'white', 
+                  borderColor: '#333',
+                  fontWeight: 'bold',
+                  fontSize: '0.9rem',
+                  textAlign: 'center'
+                }}>
+                  Actions
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {products.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} sx={{ 
+                    textAlign: 'center', 
+                    color: 'gray.400',
+                    borderColor: '#333',
+                    py: 4
+                  }}>
+                    <InventoryIcon sx={{ fontSize: 40, mb: 1, opacity: 0.5 }} />
+                    <Typography variant="h6">No products found</Typography>
+                    <Typography variant="body2">Add some products to get started</Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                products.map((product) => (
+                  <TableRow 
+                    key={product.id} 
+                    sx={{ 
+                      '&:hover': { bgcolor: '#1a1a1a' },
+                      '&:nth-of-type(even)': { bgcolor: '#0a0a0a' }
+                    }}
+                  >
+                    <TableCell sx={{ 
+                      color: 'white', 
+                      borderColor: '#333',
+                      fontWeight: 'bold'
+                    }}>
+                      #{product.id}
+                    </TableCell>
+                    <TableCell sx={{ 
+                      color: 'white', 
+                      borderColor: '#333',
+                      fontSize: '1rem'
+                    }}>
+                      {product.name}
+                    </TableCell>
+                    <TableCell sx={{ 
+                      color: '#4caf50', 
+                      borderColor: '#333',
+                      fontWeight: 'bold',
+                      fontSize: '1.1rem'
+                    }}>
+                      ${product.price.toLocaleString()}
+                    </TableCell>
+                    <TableCell sx={{ 
+                      borderColor: '#333',
+                      textAlign: 'center'
+                    }}>
+                      <IconButton 
+                        onClick={() => handleDelete(product.id)} 
+                        color="error"
+                        sx={{ 
+                          '&:hover': { 
+                            bgcolor: 'rgba(244, 67, 54, 0.1)' 
+                          }
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </CardContent>
+    </Card>
   );
 };
 
