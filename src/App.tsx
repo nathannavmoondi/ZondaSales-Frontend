@@ -7,7 +7,6 @@ import MainPage from './components/MainPage';
 import { useState } from 'react';
 
 function AppContent() {
-  const { selectedCustomer } = useZondaSales();
   const [selectedTab, setSelectedTab] = useState<number | null>(null);
   return (
     <div className="min-h-screen bg-[#181f2a] text-white">
