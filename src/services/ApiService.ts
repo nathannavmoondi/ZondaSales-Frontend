@@ -10,6 +10,9 @@ class ApiService {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     
+    console.log(import.meta.env);
+    console.log('api service', import.meta.env.VITE_BACKEND_API_URL);
+    
     // Only set Content-Type for methods that send a body
     const headers: Record<string, string> = options.method && options.method !== 'GET' && options.method !== 'DELETE'
       ? { 'Content-Type': 'application/json', ...(options.headers as any) }
