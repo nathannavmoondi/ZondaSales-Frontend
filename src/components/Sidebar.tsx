@@ -80,9 +80,9 @@ const Sidebar = ({ selectedTab, onTabChange }: SidebarProps) => {
           >
             <Tab 
               label={
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-                  <PersonIcon sx={{ mr: 1 }} />
-                  <span style={{ textAlign: 'left' }}>Customer Info</span>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-start', minHeight: 40 }}>
+                  <PersonIcon sx={{ fontSize: 22, verticalAlign: 'middle' }} />
+                  <span style={{ textAlign: 'left', fontSize: 16, lineHeight: 1, display: 'inline-block', verticalAlign: 'middle' }}>CUSTOMER INFO</span>
                 </Box>
               }
               sx={{ 
@@ -96,9 +96,9 @@ const Sidebar = ({ selectedTab, onTabChange }: SidebarProps) => {
             />
             <Tab 
               label={
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-                  <InventoryIcon sx={{ mr: 1 }} />
-                  <span style={{ textAlign: 'left' }}>Product Details</span>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-start', minHeight: 40 }}>
+                  <InventoryIcon sx={{ fontSize: 22, verticalAlign: 'middle' }} />
+                  <span style={{ textAlign: 'left', fontSize: 16, lineHeight: 1, display: 'inline-block', verticalAlign: 'middle' }}>PRODUCT DETAILS</span>
                 </Box>
               }
               sx={{ 
