@@ -14,7 +14,7 @@ const Navbar = () => (
       </Typography>
       <Box sx={{ flexGrow: 1 }} />
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <a href="https://github.com/nathannavmoondi" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+        <a href="https://github.com/nathannavmoondi/ZondaSales-Frontend" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
           <Typography sx={{ color: 'white', fontWeight: 'bold', mr: 1 }}>
             Nathan Moondi
           </Typography>

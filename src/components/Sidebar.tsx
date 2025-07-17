@@ -80,9 +80,9 @@ const Sidebar = ({ selectedTab, onTabChange }: SidebarProps) => {
           >
             <Tab 
               label={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-start', minHeight: 40 }}>
-                  <PersonIcon sx={{ fontSize: 22, verticalAlign: 'middle' }} />
-                  <span style={{ textAlign: 'left', fontSize: 16, lineHeight: 1, display: 'inline-block', verticalAlign: 'middle' }}>CUSTOMER INFO</span>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'flex-start', minHeight: 56, pl: 1 }}>
+                  <PersonIcon sx={{ fontSize: 28, verticalAlign: 'middle' }} />
+                  <span style={{ textAlign: 'left', fontSize: 20, lineHeight: 1, display: 'inline-block', verticalAlign: 'middle', fontWeight: 500 }}>CUSTOMER INFO</span>
                 </Box>
               }
               sx={{ 
@@ -90,15 +90,17 @@ const Sidebar = ({ selectedTab, onTabChange }: SidebarProps) => {
                 color: 'white !important',
                 justifyContent: 'flex-start',
                 textAlign: 'left',
+                paddingLeft: 0,
+                minHeight: 56,
                 '&.Mui-selected': { color: 'white !important' },
                 '&:hover': { bgcolor: selectedTab === 0 ? '#6b7280' : '#4b5563' }
               }} 
             />
             <Tab 
               label={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-start', minHeight: 40 }}>
-                  <InventoryIcon sx={{ fontSize: 22, verticalAlign: 'middle' }} />
-                  <span style={{ textAlign: 'left', fontSize: 16, lineHeight: 1, display: 'inline-block', verticalAlign: 'middle' }}>PRODUCT DETAILS</span>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'flex-start', minHeight: 56, pl: 1 }}>
+                  <InventoryIcon sx={{ fontSize: 28, verticalAlign: 'middle' }} />
+                  <span style={{ textAlign: 'left', fontSize: 20, lineHeight: 1, display: 'inline-block', verticalAlign: 'middle', fontWeight: 500 }}>PRODUCT DETAILS</span>
                 </Box>
               }
               sx={{ 
@@ -106,6 +108,8 @@ const Sidebar = ({ selectedTab, onTabChange }: SidebarProps) => {
                 color: 'white !important',
                 justifyContent: 'flex-start',
                 textAlign: 'left',
+                paddingLeft: 0,
+                minHeight: 56,
                 '&.Mui-selected': { color: 'white !important' },
                 '&:hover': { bgcolor: selectedTab === 1 ? '#6b7280' : '#4b5563' }
               }} 
