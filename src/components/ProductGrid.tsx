@@ -1,5 +1,6 @@
 import { useZondaSales } from '../context/ZondaSalesContext';
-import { ProductService, Product } from '../services/ProductService';
+import { ProductService } from '../services/ProductService';
+import type { Product } from '../services/ProductService';
 import { useEffect, useState, useMemo } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
