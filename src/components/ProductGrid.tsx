@@ -24,6 +24,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { toast } from 'react-toastify';
 
 const ProductGrid = () => {
   const { selectedCustomer, products, setProducts } = useZondaSales();
@@ -58,6 +59,7 @@ const ProductGrid = () => {
   const confirmDelete = async () => {
     if (productToDelete !== null) {
       await ProductService.deleteProduct(productToDelete.id);
+      toast.warn('Product Deleted');
       if (selectedCustomer) {
         const prods = await ProductService.getProductsByCustomer(selectedCustomer.id);
         setProducts(Array.isArray(prods) ? prods : []);
@@ -104,6 +106,7 @@ const ProductGrid = () => {
       };
 
       await ProductService.addProduct(product);
+      toast.success('Product Added');
       const prods = await ProductService.getProductsByCustomer(selectedCustomer.id);
       setProducts(Array.isArray(prods) ? prods : []);
       setNewProduct({ name: '', price: '' });
@@ -115,6 +118,17 @@ const ProductGrid = () => {
   const handleCloseDialog = () => {
     setOpenAddDialog(false);
     setNewProduct({ name: '', price: '' });
+  };
+
+  const handleEditProduct = async () => {
+    if (editProduct && selectedCustomer) {
+      await ProductService.updateProduct(editProduct);
+      toast.success('Product Edited');
+      const prods = await ProductService.getProductsByCustomer(selectedCustomer.id);
+      setProducts(Array.isArray(prods) ? prods : []);
+      setOpenEditDialog(false);
+      setEditProduct(null);
+    }
   };
 
   // Sort and paginate products
@@ -548,17 +562,7 @@ const ProductGrid = () => {
             Cancel
           </Button>
           <Button 
-            onClick={async () => {
-              if (editProduct && editProduct.name.trim() && editProduct.price > 0) {
-                await ProductService.updateProduct(editProduct);
-                if (selectedCustomer) {
-                  const prods = await ProductService.getProductsByCustomer(selectedCustomer.id);
-                  setProducts(Array.isArray(prods) ? prods : []);
-                }
-                setOpenEditDialog(false);
-                setEditProduct(null);
-              }
-            }}
+            onClick={handleEditProduct}
             variant="contained"
             disabled={!editProduct || !editProduct.name.trim() || !editProduct.price}
             sx={{

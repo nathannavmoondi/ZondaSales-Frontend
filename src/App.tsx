@@ -5,6 +5,8 @@ import CustomerInfo from './components/CustomerInfo';
 import ProductDetails from './components/ProductDetails';
 import MainPage from './components/MainPage';
 import { useState } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AppContent() {
   const [selectedTab, setSelectedTab] = useState<number | null>(null);
@@ -30,6 +32,7 @@ function App() {
   return (
     <ZondaSalesProvider>
       <AppContent />
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
     </ZondaSalesProvider>
   );
 }
