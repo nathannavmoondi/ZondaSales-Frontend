@@ -1,5 +1,5 @@
 import { useZondaSales } from '../context/ZondaSalesContext';
-import { ProductService } from '../services/ProductService';
+import { ProductService, Product } from '../services/ProductService';
 import { useEffect, useState, useMemo } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -34,6 +34,8 @@ const ProductGrid = () => {
   const [newProduct, setNewProduct] = useState({ name: '', price: '' });
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [productToDelete, setProductToDelete] = useState<{ id: number; name: string } | null>(null);
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
 
   useEffect(() => {
     if (selectedCustomer) {
@@ -272,7 +274,14 @@ const ProductGrid = () => {
                     key={product.id} 
                     sx={{ 
                       '&:hover': { bgcolor: '#1a1a1a' },
-                      '&:nth-of-type(even)': { bgcolor: '#0a0a0a' }
+                      '&:nth-of-type(even)': { bgcolor: '#0a0a0a' },
+                      cursor: 'pointer'
+                    }}
+                    onClick={e => {
+                      // Prevent row click if delete button is clicked
+                      if ((e.target as HTMLElement).closest('button')) return;
+                      setEditProduct(product);
+                      setOpenEditDialog(true);
                     }}
                   >
                     <TableCell sx={{ 
@@ -450,6 +459,119 @@ const ProductGrid = () => {
             }}
           >
             Add Product
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Product Dialog */}
+      <Dialog 
+        open={openEditDialog} 
+        onClose={() => { setOpenEditDialog(false); setEditProduct(null); }}
+        PaperProps={{
+          sx: {
+            bgcolor: '#1a1a1a',
+            color: 'white',
+            minWidth: 400
+          }
+        }}
+      >
+        <DialogTitle sx={{ borderBottom: '1px solid #333' }}>
+          Edit Product
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Product Name"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={editProduct?.name || ''}
+            onChange={e => setEditProduct((p: Product | null) => p ? { ...p, name: e.target.value } : p)}
+            sx={{
+              mb: 2,
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#333',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#666',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#4caf50',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#ccc',
+              },
+              '& .MuiInputBase-input': {
+                color: 'white',
+              },
+            }}
+          />
+          <TextField
+            margin="dense"
+            label="Price"
+            type="number"
+            fullWidth
+            variant="outlined"
+            value={editProduct?.price ?? ''}
+            onChange={e => setEditProduct((p: Product | null) => p ? { ...p, price: Number(e.target.value) } : p)}
+            inputProps={{ min: 0, step: 0.01 }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#333',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#666',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#4caf50',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#ccc',
+              },
+              '& .MuiInputBase-input': {
+                color: 'white',
+              },
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #333' }}>
+          <Button 
+            onClick={() => { setOpenEditDialog(false); setEditProduct(null); }}
+            sx={{ color: '#ccc' }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={async () => {
+              if (editProduct && editProduct.name.trim() && editProduct.price > 0) {
+                await ProductService.updateProduct(editProduct);
+                if (selectedCustomer) {
+                  const prods = await ProductService.getProductsByCustomer(selectedCustomer.id);
+                  setProducts(Array.isArray(prods) ? prods : []);
+                }
+                setOpenEditDialog(false);
+                setEditProduct(null);
+              }
+            }}
+            variant="contained"
+            disabled={!editProduct || !editProduct.name.trim() || !editProduct.price}
+            sx={{
+              bgcolor: '#4caf50',
+              '&:hover': {
+                bgcolor: '#45a049'
+              },
+              '&:disabled': {
+                bgcolor: '#666',
+                color: '#999'
+              }
+            }}
+          >
+            Save Changes
           </Button>
         </DialogActions>
       </Dialog>
