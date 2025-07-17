@@ -37,7 +37,10 @@ const ProductGrid = () => {
 
   useEffect(() => {
     if (selectedCustomer) {
-      setProducts(ProductService.getProductsByCustomer(selectedCustomer.id));
+      (async () => {
+        const prods = await ProductService.getProductsByCustomer(selectedCustomer.id);
+        setProducts(Array.isArray(prods) ? prods : []);
+      })();
     } else {
       setProducts([]);
     }
@@ -49,11 +52,12 @@ const ProductGrid = () => {
     setOpenDeleteDialog(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (productToDelete !== null) {
-      ProductService.deleteProduct(productToDelete.id);
+      await ProductService.deleteProduct(productToDelete.id);
       if (selectedCustomer) {
-        setProducts(ProductService.getProductsByCustomer(selectedCustomer.id));
+        const prods = await ProductService.getProductsByCustomer(selectedCustomer.id);
+        setProducts(Array.isArray(prods) ? prods : []);
       }
     }
     setOpenDeleteDialog(false);
@@ -79,7 +83,7 @@ const ProductGrid = () => {
     setPage(value);
   };
 
-  const handleAddProduct = () => {
+  const handleAddProduct = async () => {
     if (selectedCustomer && newProduct.name.trim() && newProduct.price) {
       const price = parseFloat(newProduct.price);
       if (isNaN(price) || price <= 0) {
@@ -88,7 +92,7 @@ const ProductGrid = () => {
       }
 
       // Generate new ID (simple approach - in real app you'd use a proper ID generator)
-      const maxId = Math.max(...products.map(p => p.id), 0);
+      const maxId = Math.max(...(Array.isArray(products) ? products : []).map(p => p.id), 0);
       const product = {
         id: maxId + 1,
         customerId: selectedCustomer.id,
@@ -96,8 +100,9 @@ const ProductGrid = () => {
         price: price
       };
 
-      ProductService.addProduct(product);
-      setProducts(ProductService.getProductsByCustomer(selectedCustomer.id));
+      await ProductService.addProduct(product);
+      const prods = await ProductService.getProductsByCustomer(selectedCustomer.id);
+      setProducts(Array.isArray(prods) ? prods : []);
       setNewProduct({ name: '', price: '' });
       setOpenAddDialog(false);
       setPage(1); // Reset to first page
@@ -111,7 +116,8 @@ const ProductGrid = () => {
 
   // Sort and paginate products
   const sortedAndPaginatedProducts = useMemo(() => {
-    const sorted = [...products].sort((a, b) => {
+    const arr = Array.isArray(products) ? products : [];
+    const sorted = [...arr].sort((a, b) => {
       let aValue: string | number;
       let bValue: string | number;
 
@@ -141,7 +147,7 @@ const ProductGrid = () => {
     return sorted.slice(startIndex, startIndex + itemsPerPage);
   }, [products, sortField, sortDirection, page]);
 
-  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const totalPages = Math.ceil((Array.isArray(products) ? products.length : 0) / itemsPerPage);
 
   if (!selectedCustomer) {
     return (
@@ -247,7 +253,7 @@ const ProductGrid = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {products.length === 0 ? (
+              {Array.isArray(products) && products.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} sx={{ 
                     textAlign: 'center', 

@@ -17,15 +17,22 @@ const Sidebar = ({ selectedTab, onTabChange }: SidebarProps) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
 
   useEffect(() => {
-    setCustomers(CustomerService.getCustomers());
+    (async () => {
+      try {
+        const data = await CustomerService.getCustomers();
+        setCustomers(Array.isArray(data) ? data : []);
+      } catch {
+        setCustomers([]);
+      }
+    })();
   }, []);
 
-  const handleCustomerChange = (customerId: string | number) => {
+  const handleCustomerChange = async (customerId: string | number) => {
     if (customerId === "") {
       setSelectedCustomer(null);
       return;
     }
-    const customer = CustomerService.getCustomerById(Number(customerId));
+    const customer = await CustomerService.getCustomerById(Number(customerId));
     setSelectedCustomer(customer || null);
   };
 
@@ -34,8 +41,12 @@ const Sidebar = ({ selectedTab, onTabChange }: SidebarProps) => {
       <div className="mb-6">
         <FormControl fullWidth size="small">
           <Select
-            value={selectedCustomer ? selectedCustomer.id : ''}
-            onChange={(e) => handleCustomerChange(e.target.value)}
+            value={
+              selectedCustomer && customers.some(c => c.id === selectedCustomer.id)
+                ? selectedCustomer.id
+                : ''
+            }
+            onChange={e => { handleCustomerChange(e.target.value); }}
             sx={{ 
               color: 'white',
               marginTop: '20px',
@@ -45,7 +56,7 @@ const Sidebar = ({ selectedTab, onTabChange }: SidebarProps) => {
             }}
           >
             <MenuItem value="" disabled>(Select Customer)</MenuItem>
-            {customers.map(customer => (
+            {Array.isArray(customers) && customers.map(customer => (
               <MenuItem key={customer.id} value={customer.id}>
                 {customer.name}
               </MenuItem>

@@ -16,13 +16,16 @@ const ProductDetails = () => {
 
   useEffect(() => {
     if (selectedCustomer) {
-      setProducts(ProductService.getProductsByCustomer(selectedCustomer.id));
+      (async () => {
+        const prods = await ProductService.getProductsByCustomer(selectedCustomer.id);
+        setProducts(Array.isArray(prods) ? prods : []);
+      })();
     } else {
       setProducts([]);
     }
   }, [selectedCustomer, setProducts]);
 
-  const totalValue = products.reduce((sum, product) => sum + product.price, 0);
+  const totalValue = Array.isArray(products) ? products.reduce((sum, product) => sum + product.price, 0) : 0;
 
   if (!selectedCustomer) {
     return (
