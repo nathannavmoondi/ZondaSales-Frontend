@@ -58,20 +58,7 @@ const ProductDetails = () => {
           <Typography variant="body1" color="gray.400">
             Managing products for {selectedCustomer.name}
           </Typography>
-        </Box>
-        <Button 
-          variant="contained" 
-          startIcon={<AddIcon />}
-          sx={{ 
-            bgcolor: '#1565c0',
-            '&:hover': { bgcolor: '#0d47a1' },
-            px: 3,
-            py: 1.5,
-            borderRadius: 2
-          }}
-        >
-          Add Product
-        </Button>
+        </Box>      
       </Box>
 
       {/* Stats Cards */}

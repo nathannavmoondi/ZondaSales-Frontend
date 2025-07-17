@@ -6,7 +6,7 @@ const Navbar = () => (
   <AppBar position="static" sx={{ bgcolor: '#1565c0' }}>
     <Toolbar>
       <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
-        Zonda Sales Dashboard
+        Zonda Sales System (Interview Test)
       </Typography>
     </Toolbar>
   </AppBar>

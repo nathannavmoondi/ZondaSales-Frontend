@@ -10,12 +10,19 @@ import TableRow from '@mui/material/TableRow';
 
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import Pagination from '@mui/material/Pagination';
 import Box from '@mui/material/Box';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 const ProductGrid = () => {
   const { selectedCustomer, products, setProducts } = useZondaSales();
@@ -23,6 +30,10 @@ const ProductGrid = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
   const itemsPerPage = 5;
+  const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [newProduct, setNewProduct] = useState({ name: '', price: '' });
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<{ id: number; name: string } | null>(null);
 
   useEffect(() => {
     if (selectedCustomer) {
@@ -33,11 +44,25 @@ const ProductGrid = () => {
     setPage(1); // Reset to first page when customer changes
   }, [selectedCustomer, setProducts]);
 
-  const handleDelete = (id: number) => {
-    ProductService.deleteProduct(id);
-    if (selectedCustomer) {
-      setProducts(ProductService.getProductsByCustomer(selectedCustomer.id));
+  const handleDelete = (product: { id: number; name: string }) => {
+    setProductToDelete(product);
+    setOpenDeleteDialog(true);
+  };
+
+  const confirmDelete = () => {
+    if (productToDelete !== null) {
+      ProductService.deleteProduct(productToDelete.id);
+      if (selectedCustomer) {
+        setProducts(ProductService.getProductsByCustomer(selectedCustomer.id));
+      }
     }
+    setOpenDeleteDialog(false);
+    setProductToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setOpenDeleteDialog(false);
+    setProductToDelete(null);
   };
 
   const handleSort = (field: 'id' | 'name' | 'price') => {
@@ -52,6 +77,36 @@ const ProductGrid = () => {
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
+  };
+
+  const handleAddProduct = () => {
+    if (selectedCustomer && newProduct.name.trim() && newProduct.price) {
+      const price = parseFloat(newProduct.price);
+      if (isNaN(price) || price <= 0) {
+        alert('Please enter a valid price');
+        return;
+      }
+
+      // Generate new ID (simple approach - in real app you'd use a proper ID generator)
+      const maxId = Math.max(...products.map(p => p.id), 0);
+      const product = {
+        id: maxId + 1,
+        customerId: selectedCustomer.id,
+        name: newProduct.name.trim(),
+        price: price
+      };
+
+      ProductService.addProduct(product);
+      setProducts(ProductService.getProductsByCustomer(selectedCustomer.id));
+      setNewProduct({ name: '', price: '' });
+      setOpenAddDialog(false);
+      setPage(1); // Reset to first page
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenAddDialog(false);
+    setNewProduct({ name: '', price: '' });
   };
 
   // Sort and paginate products
@@ -102,6 +157,32 @@ const ProductGrid = () => {
       boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
     }}>
       <CardContent sx={{ p: 0 }}>
+        {/* Add Product Button */}
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          p: 2, 
+          borderBottom: '1px solid #333',
+          bgcolor: '#1a1a1a'
+        }}>
+          <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
+            Products for {selectedCustomer.name}
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setOpenAddDialog(true)}
+            sx={{
+              bgcolor: '#4caf50',
+              '&:hover': {
+                bgcolor: '#45a049'
+              }
+            }}
+          >
+            Add Product
+          </Button>
+        </Box>
         <TableContainer>
           <Table>
             <TableHead>
@@ -215,7 +296,7 @@ const ProductGrid = () => {
                       textAlign: 'center'
                     }}>
                       <IconButton 
-                        onClick={() => handleDelete(product.id)} 
+                        onClick={() => handleDelete(product)} 
                         color="error"
                         sx={{ 
                           '&:hover': { 
@@ -263,6 +344,133 @@ const ProductGrid = () => {
           </Box>
         )}
       </CardContent>
+
+      {/* Add Product Dialog */}
+      <Dialog 
+        open={openAddDialog} 
+        onClose={handleCloseDialog}
+        PaperProps={{
+          sx: {
+            bgcolor: '#1a1a1a',
+            color: 'white',
+            minWidth: 400
+          }
+        }}
+      >
+        <DialogTitle sx={{ borderBottom: '1px solid #333' }}>
+          Add New Product
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Product Name"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={newProduct.name}
+            onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+            sx={{
+              mb: 2,
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#333',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#666',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#4caf50',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#ccc',
+              },
+              '& .MuiInputBase-input': {
+                color: 'white',
+              },
+            }}
+          />
+          <TextField
+            margin="dense"
+            label="Price"
+            type="number"
+            fullWidth
+            variant="outlined"
+            value={newProduct.price}
+            onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+            inputProps={{ min: 0, step: 0.01 }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#333',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#666',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#4caf50',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#ccc',
+              },
+              '& .MuiInputBase-input': {
+                color: 'white',
+              },
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #333' }}>
+          <Button 
+            onClick={handleCloseDialog}
+            sx={{ color: '#ccc' }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleAddProduct}
+            variant="contained"
+            disabled={!newProduct.name.trim() || !newProduct.price}
+            sx={{
+              bgcolor: '#4caf50',
+              '&:hover': {
+                bgcolor: '#45a049'
+              },
+              '&:disabled': {
+                bgcolor: '#666',
+                color: '#999'
+              }
+            }}
+          >
+            Add Product
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={openDeleteDialog}
+        onClose={cancelDelete}
+        PaperProps={{
+          sx: {
+            bgcolor: '#1a1a1a',
+            color: 'white',
+            minWidth: 350
+          }
+        }}
+      >
+        <DialogTitle sx={{ borderBottom: '1px solid #333' }}>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete {productToDelete?.name}"?
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #333' }}>
+          <Button onClick={cancelDelete} sx={{ color: '#ccc' }}>No</Button>
+          <Button onClick={confirmDelete} variant="contained" color="error">Yes</Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   );
 };
