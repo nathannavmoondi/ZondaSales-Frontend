@@ -6,6 +6,9 @@ import { CustomerService } from '../services/CustomerService';
 import { useZondaSales } from '../context/ZondaSalesContext';
 import { useState, useEffect } from 'react';
 import type { Customer } from '../services/CustomerService';
+import Box from '@mui/material/Box';
+import PersonIcon from '@mui/icons-material/Person';
+import InventoryIcon from '@mui/icons-material/Inventory';
 
 interface SidebarProps {
   selectedTab: number | null;
@@ -75,18 +78,38 @@ const Sidebar = ({ selectedTab, onTabChange }: SidebarProps) => {
               '.MuiTabs-indicator': { backgroundColor: '#90cdf4' },
             }}
           >
-            <Tab label="Customer Info" sx={{ 
-              bgcolor: selectedTab === 0 ? '#6b7280' : 'inherit', 
-              color: 'white !important',
-              '&.Mui-selected': { color: 'white !important' },
-              '&:hover': { bgcolor: selectedTab === 0 ? '#6b7280' : '#4b5563' }
-            }} />
-            <Tab label="Product Details" sx={{ 
-              bgcolor: selectedTab === 1 ? '#6b7280' : 'inherit', 
-              color: 'white !important',
-              '&.Mui-selected': { color: 'white !important' },
-              '&:hover': { bgcolor: selectedTab === 1 ? '#6b7280' : '#4b5563' }
-            }} />
+            <Tab 
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                  <PersonIcon sx={{ mr: 1 }} />
+                  <span style={{ textAlign: 'left' }}>Customer Info</span>
+                </Box>
+              }
+              sx={{ 
+                bgcolor: selectedTab === 0 ? '#6b7280' : 'inherit', 
+                color: 'white !important',
+                justifyContent: 'flex-start',
+                textAlign: 'left',
+                '&.Mui-selected': { color: 'white !important' },
+                '&:hover': { bgcolor: selectedTab === 0 ? '#6b7280' : '#4b5563' }
+              }} 
+            />
+            <Tab 
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                  <InventoryIcon sx={{ mr: 1 }} />
+                  <span style={{ textAlign: 'left' }}>Product Details</span>
+                </Box>
+              }
+              sx={{ 
+                bgcolor: selectedTab === 1 ? '#6b7280' : 'inherit', 
+                color: 'white !important',
+                justifyContent: 'flex-start',
+                textAlign: 'left',
+                '&.Mui-selected': { color: 'white !important' },
+                '&:hover': { bgcolor: selectedTab === 1 ? '#6b7280' : '#4b5563' }
+              }} 
+            />
           </Tabs>
         </ListItem>
       </List>
