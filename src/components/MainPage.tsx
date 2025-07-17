@@ -8,7 +8,7 @@ const MainPage = () => {
         Welcome to Zonda Sales System
       </Typography>
       <Typography variant="h6" sx={{ color: 'gray.400' }}>
-        Please select a customer
+        Please select a customer on the left
       </Typography>
     </Box>
   );

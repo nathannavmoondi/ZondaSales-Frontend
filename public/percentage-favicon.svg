@@ -1,4 +1,6 @@
-<svg width="32 height=32viewBox="03232 xmlns=http://www.w3org/2000vg>
-  <rect width="32height="32fill="white/>
-  <text x="16" y=22font-family=Arial, sans-serif" font-size=20 font-weight=bold" text-anchor="middle fill="black>%</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="white"/>
+  <rect x="6" y="6" width="20" height="6" rx="3" transform="rotate(45 16 16)" fill="black"/>
+  <rect x="6" y="20" width="20" height="6" rx="3" transform="rotate(-45 16 16)" fill="black"/>
+  <circle cx="8" cy="24" r="3" fill="black"/>
 </svg> 

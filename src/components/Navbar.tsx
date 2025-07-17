@@ -5,7 +5,8 @@ import Typography from '@mui/material/Typography';
 const Navbar = () => (
   <AppBar position="static" sx={{ bgcolor: '#1565c0' }}>
     <Toolbar>
-      <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
+      <img src="/percentage-favicon.svg" alt="Logo" height={32} style={{ marginRight: 12, verticalAlign: 'middle' }} />
+      <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', display: 'inline', verticalAlign: 'middle' }}>
         Zonda Sales System (Interview Test)
       </Typography>
     </Toolbar>
